@@ -18,6 +18,12 @@ class Grievance(models.Model):
         ('Rejected', 'Rejected'),
     ]
 
+    PRIORITY_CHOICES = [
+        ('Low', 'Low'),
+        ('Medium', 'Medium'),
+        ('High', 'High'),
+    ]
+
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -34,13 +40,24 @@ class Grievance(models.Model):
 
     name = models.CharField(max_length=100)
     email = models.EmailField()
+
     complaint = models.TextField()
 
-    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES)
+    category = models.CharField(
+        max_length=50,
+        choices=CATEGORY_CHOICES
+    )
+
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
         default='Pending'
+    )
+
+    priority = models.CharField(
+        max_length=20,
+        choices=PRIORITY_CHOICES,
+        default='Low'
     )
 
     photo = models.ImageField(
@@ -49,10 +66,21 @@ class Grievance(models.Model):
         null=True
     )
 
-    latitude = models.CharField(max_length=100, blank=True, null=True)
-    longitude = models.CharField(max_length=100, blank=True, null=True)
+    latitude = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True
+    )
 
-    created_at = models.DateTimeField(auto_now_add=True)
+    longitude = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
 
     def save(self, *args, **kwargs):
         if not self.tracking_id:

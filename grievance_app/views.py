@@ -23,6 +23,47 @@ def detect_category(text):
         return "Other"
 
 
+def detect_priority(text):
+    text = text.lower()
+
+    high_words = [
+        "urgent",
+        "emergency",
+        "fire",
+        "accident",
+        "danger",
+        "serious",
+        "immediate",
+        "help",
+        "medical",
+        "injury"
+    ]
+
+    medium_words = [
+        "wifi",
+        "internet",
+        "server",
+        "exam",
+        "marks",
+        "teacher",
+        "hostel",
+        "room",
+        "mess",
+        "water",
+        "electricity"
+    ]
+
+    for word in high_words:
+        if word in text:
+            return "High"
+
+    for word in medium_words:
+        if word in text:
+            return "Medium"
+
+    return "Low"
+
+
 def home(request):
     return render(request, 'home.html')
 
@@ -41,6 +82,8 @@ def submit_grievance(request):
                 grievance.email = request.user.email
 
             grievance.category = detect_category(grievance.complaint)
+
+            grievance.priority = detect_priority(grievance.complaint)
 
             grievance.save()
 
@@ -76,8 +119,17 @@ def dashboard(request):
         Q(user=request.user) | Q(email=request.user.email)
     ).order_by('-created_at')
 
+    total_count = complaints.count()
+    pending_count = complaints.filter(status='Pending').count()
+    resolved_count = complaints.filter(status='Resolved').count()
+    rejected_count = complaints.filter(status='Rejected').count()
+
     return render(request, 'dashboard.html', {
-        'complaints': complaints
+        'complaints': complaints,
+        'total_count': total_count,
+        'pending_count': pending_count,
+        'resolved_count': resolved_count,
+        'rejected_count': rejected_count,
     })
 
 

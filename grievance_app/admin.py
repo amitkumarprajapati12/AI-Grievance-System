@@ -5,12 +5,14 @@ from .models import Grievance
 
 @admin.register(Grievance)
 class GrievanceAdmin(admin.ModelAdmin):
+
     list_display = (
         'tracking_id',
         'name',
         'email',
         'category',
         'status',
+        'priority',
         'photo_preview',
         'location_link',
         'created_at'
@@ -19,6 +21,7 @@ class GrievanceAdmin(admin.ModelAdmin):
     list_filter = (
         'status',
         'category',
+        'priority',
         'created_at'
     )
 
