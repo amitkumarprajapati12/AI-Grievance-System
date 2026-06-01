@@ -10,39 +10,96 @@
 <body class="bg-light">
 
 <div class="container mt-5">
+
     <div class="card shadow p-5">
 
         <h2 class="text-center mb-4">Submit Grievance</h2>
 
         <form method="POST" enctype="multipart/form-data">
-
             {% csrf_token %}
 
             {{ form.as_p }}
 
-            <button type="button"
-                    onclick="startVoiceTyping()"
-                    class="btn btn-info w-100 mb-3">
+            <hr>
+
+            <h5>Live Photo Capture</h5>
+
+            <video id="camera" width="320" height="240" autoplay class="border rounded"></video>
+
+            <br><br>
+
+            <button type="button" class="btn btn-dark" onclick="startCamera()">
+                Start Camera
+            </button>
+
+            <button type="button" class="btn btn-primary" onclick="capturePhoto()">
+                Capture Photo
+            </button>
+
+            <br><br>
+
+            <canvas id="canvas" width="320" height="240" style="display:none;"></canvas>
+
+            <img id="preview" width="320" height="240" class="border rounded" style="display:none;">
+
+            <br><br>
+
+            <button type="button" onclick="startVoiceTyping()" class="btn btn-info w-100 mb-3">
                 Start Voice Complaint
             </button>
 
-            <button type="button"
-                    onclick="getLocation()"
-                    class="btn btn-warning w-100 mb-3">
+            <button type="button" onclick="getLocation()" class="btn btn-warning w-100 mb-3">
                 Get Live Location
             </button>
 
-            <button type="submit"
-                    class="btn btn-success w-100">
+            <button type="submit" class="btn btn-success w-100">
                 Submit Complaint
             </button>
 
         </form>
 
     </div>
+
 </div>
 
 <script>
+let stream;
+
+function startCamera() {
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then(function(mediaStream) {
+            stream = mediaStream;
+            document.getElementById("camera").srcObject = mediaStream;
+        })
+        .catch(function(error) {
+            alert("Camera permission denied or camera not available.");
+        });
+}
+
+function capturePhoto() {
+    let video = document.getElementById("camera");
+    let canvas = document.getElementById("canvas");
+    let preview = document.getElementById("preview");
+
+    let context = canvas.getContext("2d");
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    canvas.toBlob(function(blob) {
+        let file = new File([blob], "live_photo.png", { type: "image/png" });
+
+        let dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+
+        let photoInput = document.getElementById("id_photo");
+        photoInput.files = dataTransfer.files;
+
+        preview.src = URL.createObjectURL(blob);
+        preview.style.display = "block";
+
+        alert("Live photo captured successfully!");
+    }, "image/png");
+}
+
 function getLocation() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position) {
@@ -51,7 +108,7 @@ function getLocation() {
             alert("Location captured successfully!");
         });
     } else {
-        alert("Location not supported by this browser.");
+        alert("Location not supported.");
     }
 }
 
@@ -59,30 +116,17 @@ function startVoiceTyping() {
     var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
-        alert("Voice typing is not supported in this browser. Please use Google Chrome.");
+        alert("Voice typing not supported. Use Chrome.");
         return;
     }
 
     var recognition = new SpeechRecognition();
-
     recognition.lang = "hi-IN";
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
-
     recognition.start();
 
     recognition.onresult = function(event) {
         var voiceText = event.results[0][0].transcript;
-
-        var complaintBox = document.getElementById("id_complaint");
-
-        complaintBox.value = complaintBox.value + " " + voiceText;
-
-        alert("Voice complaint added successfully!");
-    };
-
-    recognition.onerror = function(event) {
-        alert("Voice error: " + event.error);
+        document.getElementById("id_complaint").value += " " + voiceText;
     };
 }
 </script>

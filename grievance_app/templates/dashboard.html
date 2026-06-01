@@ -105,6 +105,24 @@
             border-radius: 12px;
         }
 
+        .pdf-btn {
+            background: #ffffff;
+            color: #111827;
+            border: none;
+            border-radius: 10px;
+            padding: 6px 12px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .pdf-btn:hover {
+            transform: scale(1.05);
+            transition: 0.3s;
+            background: #facc15;
+            color: #111827;
+        }
+
         table {
             border-radius: 15px;
             overflow: hidden;
@@ -227,6 +245,7 @@
                         <th>Photo</th>
                         <th>Location</th>
                         <th>Date</th>
+                        <th>PDF</th>
                     </tr>
                 </thead>
 
@@ -292,11 +311,18 @@
                         </td>
 
                         <td>{{ complaint.created_at }}</td>
+
+                        <td>
+                            <a href="{% url 'download_pdf' complaint.id %}"
+                               class="pdf-btn">
+                                📄 PDF
+                            </a>
+                        </td>
                     </tr>
 
                     {% empty %}
                     <tr>
-                        <td colspan="8" class="text-center">
+                        <td colspan="9" class="text-center">
                             No complaints found
                         </td>
                     </tr>
