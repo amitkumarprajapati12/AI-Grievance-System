@@ -79,6 +79,10 @@
             background: linear-gradient(135deg, #dc2626, #f43f5e);
         }
 
+        .analytics-card {
+            background: linear-gradient(135deg, #7c3aed, #ec4899);
+        }
+
         .complaint-img {
             width: 90px;
             height: 70px;
@@ -189,6 +193,44 @@
                     <h1>❌</h1>
                     <h2>{{ rejected_count }}</h2>
                     <p>Rejected</p>
+                </div>
+            </div>
+
+        </div>
+
+        <h3 class="section-title">SQL Category Analytics</h3>
+
+        <div class="row mb-4">
+
+            <div class="col-md-3 mb-3">
+                <div class="stat-card analytics-card">
+                    <h1>💻</h1>
+                    <h2>{{ technical_count }}</h2>
+                    <p>Technical</p>
+                </div>
+            </div>
+
+            <div class="col-md-3 mb-3">
+                <div class="stat-card resolved-card">
+                    <h1>📚</h1>
+                    <h2>{{ academic_count }}</h2>
+                    <p>Academic</p>
+                </div>
+            </div>
+
+            <div class="col-md-3 mb-3">
+                <div class="stat-card pending-card">
+                    <h1>🏠</h1>
+                    <h2>{{ hostel_count }}</h2>
+                    <p>Hostel</p>
+                </div>
+            </div>
+
+            <div class="col-md-3 mb-3">
+                <div class="stat-card rejected-card">
+                    <h1>📌</h1>
+                    <h2>{{ other_count }}</h2>
+                    <p>Other</p>
                 </div>
             </div>
 

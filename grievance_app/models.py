@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.mail import send_mail
 
 
 class Grievance(models.Model):
@@ -40,7 +41,6 @@ class Grievance(models.Model):
 
     name = models.CharField(max_length=100)
     email = models.EmailField()
-
     complaint = models.TextField()
 
     category = models.CharField(
@@ -83,6 +83,15 @@ class Grievance(models.Model):
     )
 
     def save(self, *args, **kwargs):
+        old_status = None
+
+        if self.pk:
+            try:
+                old_complaint = Grievance.objects.get(pk=self.pk)
+                old_status = old_complaint.status
+            except Grievance.DoesNotExist:
+                old_status = None
+
         if not self.tracking_id:
             last_complaint = Grievance.objects.all().order_by('id').last()
 
@@ -94,6 +103,26 @@ class Grievance(models.Model):
             self.tracking_id = f"GRV-{new_id}"
 
         super().save(*args, **kwargs)
+
+        if old_status and old_status != self.status:
+            send_mail(
+                subject='Complaint Status Updated',
+                message=f'''
+Hello {self.name},
+
+Your complaint status has been updated.
+
+Tracking ID: {self.tracking_id}
+Old Status: {old_status}
+New Status: {self.status}
+
+Thank you,
+AI Grievance System
+''',
+                from_email=None,
+                recipient_list=[self.email],
+                fail_silently=False,
+            )
 
     def __str__(self):
         if self.tracking_id:

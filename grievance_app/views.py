@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.db.models import Q
 from django.http import HttpResponse
+from django.core.mail import send_mail
 
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
@@ -16,13 +17,10 @@ def detect_category(text):
 
     if "wifi" in text or "server" in text or "internet" in text:
         return "Technical"
-
     elif "teacher" in text or "exam" in text or "marks" in text:
         return "Academic"
-
     elif "hostel" in text or "room" in text or "mess" in text:
         return "Hostel"
-
     else:
         return "Other"
 
@@ -31,30 +29,15 @@ def detect_priority(text):
     text = text.lower()
 
     high_words = [
-        "urgent",
-        "emergency",
-        "fire",
-        "accident",
-        "danger",
-        "serious",
-        "immediate",
-        "help",
-        "medical",
-        "injury"
+        "urgent", "emergency", "fire", "accident",
+        "danger", "serious", "immediate", "help",
+        "medical", "injury"
     ]
 
     medium_words = [
-        "wifi",
-        "internet",
-        "server",
-        "exam",
-        "marks",
-        "teacher",
-        "hostel",
-        "room",
-        "mess",
-        "water",
-        "electricity"
+        "wifi", "internet", "server", "exam", "marks",
+        "teacher", "hostel", "room", "mess",
+        "water", "electricity"
     ]
 
     for word in high_words:
@@ -86,10 +69,29 @@ def submit_grievance(request):
                 grievance.email = request.user.email
 
             grievance.category = detect_category(grievance.complaint)
-
             grievance.priority = detect_priority(grievance.complaint)
 
             grievance.save()
+
+            send_mail(
+                subject='Complaint Submitted Successfully',
+                message=f'''
+Hello {grievance.name},
+
+Your complaint has been submitted successfully.
+
+Tracking ID: {grievance.tracking_id}
+Category: {grievance.category}
+Priority: {grievance.priority}
+Status: {grievance.status}
+
+Thank you,
+AI Grievance System
+''',
+                from_email=None,
+                recipient_list=[grievance.email],
+                fail_silently=False,
+            )
 
             return redirect('dashboard')
 
@@ -128,12 +130,23 @@ def dashboard(request):
     resolved_count = complaints.filter(status='Resolved').count()
     rejected_count = complaints.filter(status='Rejected').count()
 
+    technical_count = complaints.filter(category='Technical').count()
+    academic_count = complaints.filter(category='Academic').count()
+    hostel_count = complaints.filter(category='Hostel').count()
+    other_count = complaints.filter(category='Other').count()
+
     return render(request, 'dashboard.html', {
         'complaints': complaints,
+
         'total_count': total_count,
         'pending_count': pending_count,
         'resolved_count': resolved_count,
         'rejected_count': rejected_count,
+
+        'technical_count': technical_count,
+        'academic_count': academic_count,
+        'hostel_count': hostel_count,
+        'other_count': other_count,
     })
 
 
@@ -165,7 +178,6 @@ def download_complaint_pdf(request, complaint_id):
     )
 
     pdf = canvas.Canvas(response, pagesize=A4)
-
     width, height = A4
 
     pdf.setFont("Helvetica-Bold", 20)
@@ -218,9 +230,7 @@ def download_complaint_pdf(request, complaint_id):
     text_object = pdf.beginText(60, y)
     text_object.setLeading(18)
 
-    complaint_text = complaint.complaint
-
-    for line in complaint_text.splitlines():
+    for line in complaint.complaint.splitlines():
         text_object.textLine(line)
 
     pdf.drawText(text_object)
