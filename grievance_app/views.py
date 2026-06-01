@@ -81,6 +81,24 @@ def dashboard(request):
     })
 
 
+def track_complaint(request):
+    complaint = None
+    error = None
+
+    if request.method == 'POST':
+        tracking_id = request.POST.get('tracking_id')
+
+        try:
+            complaint = Grievance.objects.get(tracking_id=tracking_id)
+        except Grievance.DoesNotExist:
+            error = "No complaint found with this Tracking ID."
+
+    return render(request, 'track.html', {
+        'complaint': complaint,
+        'error': error
+    })
+
+
 def logout_user(request):
     logout(request)
     return redirect('home')

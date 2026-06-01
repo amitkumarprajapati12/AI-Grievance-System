@@ -14,6 +14,8 @@ urlpatterns = [
 
     path('dashboard/', views.dashboard, name='dashboard'),
 
+    path('track/', views.track_complaint, name='track'),
+
     path(
         'login/',
         auth_views.LoginView.as_view(template_name='login.html'),
