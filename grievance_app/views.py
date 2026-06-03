@@ -8,8 +8,12 @@ from django.core.mail import send_mail
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
 from .forms import GrievanceForm, RegisterForm
 from .models import Grievance
+from .serializers import GrievanceSerializer
 
 
 def detect_category(text):
@@ -239,6 +243,39 @@ def download_complaint_pdf(request, complaint_id):
     pdf.save()
 
     return response
+
+
+@api_view(['GET'])
+def api_complaints(request):
+    complaints = Grievance.objects.all().order_by('-created_at')
+    serializer = GrievanceSerializer(complaints, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+def api_dashboard_stats(request):
+    total = Grievance.objects.count()
+    pending = Grievance.objects.filter(status='Pending').count()
+    resolved = Grievance.objects.filter(status='Resolved').count()
+    rejected = Grievance.objects.filter(status='Rejected').count()
+
+    technical = Grievance.objects.filter(category='Technical').count()
+    academic = Grievance.objects.filter(category='Academic').count()
+    hostel = Grievance.objects.filter(category='Hostel').count()
+    other = Grievance.objects.filter(category='Other').count()
+
+    data = {
+        'total': total,
+        'pending': pending,
+        'resolved': resolved,
+        'rejected': rejected,
+        'technical': technical,
+        'academic': academic,
+        'hostel': hostel,
+        'other': other,
+    }
+
+    return Response(data)
 
 
 def logout_user(request):

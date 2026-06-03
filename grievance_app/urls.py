@@ -29,4 +29,13 @@ urlpatterns = [
     ),
 
     path('logout/', views.logout_user, name='logout'),
+
+    # API URLs for React
+    path('api/complaints/', views.api_complaints, name='api_complaints'),
+
+    path(
+        'api/dashboard-stats/',
+        views.api_dashboard_stats,
+        name='api_dashboard_stats'
+    ),
 ]
