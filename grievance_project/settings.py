@@ -2,12 +2,25 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+
+# =========================
+# SECURITY
+# =========================
+
 SECRET_KEY = 'django-insecure-5aa99r#5o+z$f#q@2c9u3ybm63uit3y1*h*c!sx5us0ga!e1&*'
 
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    ".vercel.app",
+    "localhost",
+    "127.0.0.1",
+]
 
+
+# =========================
+# INSTALLED APPS
+# =========================
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -24,6 +37,10 @@ INSTALLED_APPS = [
 ]
 
 
+# =========================
+# MIDDLEWARE
+# =========================
+
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
 
@@ -37,7 +54,16 @@ MIDDLEWARE = [
 ]
 
 
+# =========================
+# URL CONFIGURATION
+# =========================
+
 ROOT_URLCONF = 'grievance_project.urls'
+
+
+# =========================
+# TEMPLATES
+# =========================
 
 TEMPLATES = [
     {
@@ -54,8 +80,17 @@ TEMPLATES = [
     },
 ]
 
+
+# =========================
+# WSGI
+# =========================
+
 WSGI_APPLICATION = 'grievance_project.wsgi.application'
 
+
+# =========================
+# DATABASE
+# =========================
 
 DATABASES = {
     'default': {
@@ -64,6 +99,10 @@ DATABASES = {
     }
 }
 
+
+# =========================
+# PASSWORD VALIDATION
+# =========================
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -81,6 +120,10 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+# =========================
+# LANGUAGE & TIME
+# =========================
+
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
@@ -90,25 +133,65 @@ USE_I18N = True
 USE_TZ = True
 
 
-STATIC_URL = 'static/'
+# =========================
+# STATIC FILES
+# =========================
+
+STATIC_URL = '/static/'
+
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+
+# =========================
+# DEFAULT PRIMARY KEY
+# =========================
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
+# =========================
+# LOGIN / LOGOUT
+# =========================
+
 LOGIN_URL = 'login'
+
 LOGIN_REDIRECT_URL = 'home'
+
 LOGOUT_REDIRECT_URL = 'home'
 
 
+# =========================
+# MEDIA FILES
+# =========================
+
 MEDIA_URL = '/media/'
+
 MEDIA_ROOT = BASE_DIR / 'media'
 
 
+# =========================
+# EMAIL
+# =========================
+
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
 DEFAULT_FROM_EMAIL = 'AI Grievance System <noreply@grievance.com>'
 
+
+# =========================
+# CORS
+# =========================
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+]
+
+
+# =========================
+# CSRF
+# =========================
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://*.vercel.app",
 ]
